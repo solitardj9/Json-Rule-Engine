@@ -1,5 +1,7 @@
 package jsonRuleEngine;
 
+import java.util.List;
+
 public class Test {
 	
 	public static void main(String[] args) {
@@ -48,6 +50,8 @@ public class Test {
 				"	]\r\n" + 
 				"}";
 		
+		// 1) Alphabet and Numeric only in String at expression of trigger
+		// 
 		String jsonRuleEngineConfigs = "{\r\n" + 
 				"	\"configs\" : [\r\n" + 
 				"		{\r\n" + 
@@ -64,8 +68,15 @@ public class Test {
 		JsonRuleEngine jsonRuleEngine = new JsonRuleEngineImpl();
 		
 		jsonRuleEngine.insertConfigs(jsonRuleEngineConfigs);
-		
+
 		System.out.println(jsonRuleEngine.getConfigs().toString());
 		
+		List<String> jsonRetStringList = null;
+		
+		jsonRetStringList = jsonRuleEngine.execute(sampleJsonString1);
+		System.out.println(jsonRetStringList.toString());
+		
+		jsonRetStringList = jsonRuleEngine.execute(sampleJsonString2);
+		System.out.println(jsonRetStringList.toString());
 	}
 }
