@@ -15,7 +15,7 @@ public class Test {
 				"		\"city\" : \"New York\",\r\n" + 
 				"		\"state\" : \"NY\",\r\n" + 
 				"		\"postalCode\" : \"10021\"\r\n" + 
-				"	}\r\n" + 
+				"	},\r\n" + 
 				"	\"phoneNumber\" : [\r\n" + 
 				"		{\r\n" + 
 				"			\"type\" : \"home\",\r\n" + 
@@ -37,7 +37,7 @@ public class Test {
 				"		\"city\" : \"Illinois\",\r\n" + 
 				"		\"state\" : \"NY\",\r\n" + 
 				"		\"postalCode\" : \"10021\"\r\n" + 
-				"	}\r\n" + 
+				"	},\r\n" + 
 				"	\"phoneNumber\" : [\r\n" + 
 				"		{\r\n" + 
 				"			\"type\" : \"home\",\r\n" + 
@@ -54,14 +54,20 @@ public class Test {
 		// 
 		String jsonRuleEngineConfigs = "{\r\n" + 
 				"	\"configs\" : [\r\n" + 
+//				"		{\r\n" + 
+//				"			\"trigger\" : \"((PAYLOAD_VALUE(address.city) == 'New York') && (PAYLOAD_VALUE(age) == 20))\",\r\n" + 
+//				"			\"result\" : \"PAYLOAD_VALUE()\"\r\n" + 
+//				"		},\r\n" +
 				"		{\r\n" + 
-				"			\"trigger\" : \"((PAYLOAD_VALUE(address.city) == 'New York') && (PAYLOAD_VALUE(age) == 20))\",\r\n" + 
+				//"			\"trigger\" : \"((PAYLOAD_VALUE(address.city) == 'Illinois') && (PAYLOAD_VALUE_WITH(type, PAYLOAD_ARRAY(phoneNumber, 0)) == 'home'))\",\r\n" + 
+				//"			\"trigger\" : \"((PAYLOAD_VALUE_WITH(type, PAYLOAD_ARRAY) == 'home') && (PAYLOAD_VALUE(address.city) == 'Illinois'))\",\r\n" +
+				"			\"trigger\" : \"((PAYLOAD_VALUE_WITH(type, PAYLOAD_ARRAY(phoneNumber, 0)) == 'home') && (PAYLOAD_VALUE(address.city) == 'Illinois'))\",\r\n" +
 				"			\"result\" : \"PAYLOAD_VALUE()\"\r\n" + 
-				"		},\r\n" + 
-				"		{\r\n" + 
-				"			\"trigger\" : \"((PAYLOAD_VALUE(address.city) == 'Illinois') && (PAYLOAD_VALUE(age) == 30))\",\r\n" + 
-				"			\"result\" : \"PAYLOAD_VALUE()\"\r\n" + 
-				"		}\r\n" + 
+				"		}\r\n" +
+//				"		{\r\n" + 
+//				"			\"trigger\" : \"((PAYLOAD_VALUE(address.city) == 'Illinois') && (PAYLOAD_VALUE(age) == 30))\",\r\n" + 
+//				"			\"result\" : \"PAYLOAD_VALUE()\"\r\n" + 
+//				"		}\r\n" + 
 				"	]\r\n" + 
 				"}";
 			
@@ -76,7 +82,7 @@ public class Test {
 		jsonRetStringList = jsonRuleEngine.execute(sampleJsonString1);
 		System.out.println(jsonRetStringList.toString());
 		
-		jsonRetStringList = jsonRuleEngine.execute(sampleJsonString2);
-		System.out.println(jsonRetStringList.toString());
+//		jsonRetStringList = jsonRuleEngine.execute(sampleJsonString2);
+//		System.out.println(jsonRetStringList.toString());
 	}
 }

@@ -12,5 +12,8 @@
 	<classpathentry kind="lib" path="jarLibrary/slf4j-api-1.7.30.jar"/>
 	<classpathentry kind="lib" path="jarLibrary/jul-to-slf4j-1.7.30.jar"/>
 	<classpathentry kind="lib" path="jarLibrary/slf4j-simple-1.7.30.jar"/>
+	<classpathentry kind="lib" path="jarLibrary/json-smart-2.3.jar"/>
+	<classpathentry kind="lib" path="jarLibrary/accessors-smart-1.2.jar"/>
+	<classpathentry kind="lib" path="jarLibrary/commons-compiler-3.1.2.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

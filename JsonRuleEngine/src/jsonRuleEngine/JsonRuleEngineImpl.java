@@ -1,8 +1,13 @@
 package jsonRuleEngine;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.regex.Pattern;
 
+import org.codehaus.janino.ExpressionEvaluator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -11,7 +16,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import jsonRuleEngine.data.JsonRuleEngineConfig;
 import jsonRuleEngine.data.JsonRuleEngineConfigs;
+import jsonRuleEngine.rule.RuleUtil;
 import jsonRuleEngine.rule.Rules;
+import jsonRuleEngine.rule.Rules.RULE;
 
 public class JsonRuleEngineImpl implements JsonRuleEngine {
 	//
@@ -66,7 +73,15 @@ public class JsonRuleEngineImpl implements JsonRuleEngine {
 	}
 	
 	
-
+	/**
+	 * check Trigger Expression
+	 * <p>- Alphabet and Numeric only in String at expression of trigger
+	 * <p>- A string literal is bracketed by either single quotes ( ' )
+	 * <p>- ex) "trigger" : "PAYLOAD_VALUE(address.city) == 'New York'"
+	 * @param trigger
+	 * @param data
+	 * @return
+	 */
 	private Boolean isTriggered(String trigger, String data) {
 		//
 		if (data == null || data.isEmpty()) {
@@ -74,47 +89,89 @@ public class JsonRuleEngineImpl implements JsonRuleEngine {
 			return false;
 		}
 		
-		String tmpTrigger = replaceSingleQuotesToDoubleQuotes(new String(trigger));
+		// 1) single quotes are changed double quotes
+		String tmpTrigger = RuleUtil.replaceSingleQuotesToDoubleQuotes(new String(trigger));
 		
 		logger.info("[JsonRuleEngine].isTriggered : tmpTrigger = " + tmpTrigger);
 		
-		List<String> rules = Rules.getRules();
+		// 2) get Rules
+		List<String> ruleTypes = Rules.getRuleTypes();
 		
-		logger.info("[JsonRuleEngine].isTriggered : rules = " + rules.toString());
-		 
+		logger.info("[JsonRuleEngine].isTriggered : ruleTypes = " + ruleTypes.toString());
 		
-		// TODO
+		for (String ruleType : ruleTypes) {
+			//
+			RULE rule = Rules.getRuleByType(ruleType);
+			
+			tmpTrigger = rule.replaceRuleExpressionWithData(tmpTrigger, data);
+		}
 		
-		
-		
-        
-        
-//        for (String iter : functions) {
-//            //
-////            System.out.println("[DataActionWorker].checkTrigger : trigger=" + trigger);
-//            
-//            Pattern p = Pattern.compile(Functions.getFunctionRegExp(iter));
-//            Matcher m = p.matcher(trigger);
-//            
-//            while(m.find()) {
-//                String matchedFunction = m.group();
-//                replacedTrigger = Functions.replaceFunction(iter, replacedTrigger, matchedFunction, data);
-//            }
-//            
-////            System.out.println("[DataActionWorker].checkTrigger : replacedTrigger=" + replacedTrigger);
-//        }
-//        
-//        if(replacedTrigger != null)
-//            return evaluateTrigger(replacedTrigger);
-//        else
-//            return false;
-		
-		return null;		
+		if (tmpTrigger != null)
+			return evaluateTrigger(tmpTrigger);
+		else
+			return false;
 	}
+	
+    private Boolean evaluateTrigger(String trigger) {
+    	//
+    	String regexp = "[!@#$%^&*(),?:{}|<=>]";
+    	
+    	try {
+    		Boolean result = null;
+
+    		Pattern pattern = Pattern.compile(regexp);
+    		String[] operands = pattern.split(trigger);
+    		
+    		List<String> params = new ArrayList<>();
+    		for (String iter : operands) {
+    			if (iter != null && !iter.equals("")  && !iter.equals(" ")) {
+    				params.add(iter);
+    			}
+    		}
+    		
+    		// Now here's where the story begins...
+    		ExpressionEvaluator ee = new ExpressionEvaluator();
+    		
+    		// The expression will have two "int" parameters: "a" and "b".
+    		String[] arrParams = new String[params.size()];
+    		Class[] arrClasses = new Class[params.size()];
+    		Object[] arrObjects = new Object[params.size()];
+    		
+    		int count = 0;
+    		for (String iter : params) {
+    			String tmpParam = ("p" + count);
+    			arrParams[count] = tmpParam;
+    			arrClasses[count] = String.class;
+    			
+    			String value = iter.trim();
+    			arrObjects[count] = value;
+    			count++;
+            }
+    		
+    		// The expression will have two "int" parameters: "a" and "b".
+    		ee.setParameters(arrParams, arrClasses);
+    		
+    		// And the expression (i.e. "result") type is also "int".
+    		ee.setExpressionType(Boolean.class);
+    		
+    		// And now we "cook" (scan, parse, compile and load) the fabulous expression.
+    		//System.out.println("[DataActionWorker].evaluateTrigger :" + tmpTrigger);
+    		ee.cook(trigger);
+    		
+    		// Eventually we evaluate the expression - and that goes super-fast.
+    		result = (Boolean) ee.evaluate(arrObjects);
+    		logger.info("[JsonRuleEngine].evaluateTrigger : result = " + result.toString());
+    		
+    		return result;
+    	}
+    	catch (Exception e) {
+    		logger.info("[JsonRuleEngine].evaluateTrigger : error = " + e.toString());
+    		return false;
+    	}
+    }
 	
 	private String makeResult(String result, String data) {
 		//
-		
 		// TODO
 		
 		return null;
@@ -125,104 +182,7 @@ public class JsonRuleEngineImpl implements JsonRuleEngine {
 	
 	
 	
-//	
-//    
-//    /**
-//     * Method Name : evaluateTrigger
-//     * Method Desc : Trigger 寃��궗 (�끉由� �뿰�궛 臾몄옄�뿴 �솗�씤)
-//     * @param trigger
-//     * @return
-//     */
-//    private Boolean evaluateTrigger(String trigger) {
-//        //
-//        String regexp = "[!@#$%^&*(),?:{}|<=>]";
-//        
-//        try {
-//            Boolean result = null;
-//            
-//            //System.out.println("[DataActionWorker].evaluateTrigger : trigger=" + trigger);
-//            String tmpTrigger = trigger.replace("\"", "");
-//            //System.out.println("[DataActionWorker].evaluateTrigger : tmpTrigger=" + tmpTrigger);
-//            
-//            Pattern pattern = Pattern.compile(regexp);
-//            String[] operands = pattern.split(tmpTrigger);
-//            
-//            List<String> params = new ArrayList<>();
-//            for (String iter : operands) {
-//                if (iter != null && !iter.equals("")  && !iter.equals(" ")) {
-//                    params.add(iter);
-//                }
-//            }
-//            
-//            // Now here's where the story begins...
-//            ExpressionEvaluator ee = new ExpressionEvaluator();
-//            
-//            // The expression will have two "int" parameters: "a" and "b".
-//            Map<String, String> strMap = new HashMap<>();
-//            String[] arrParams = new String[params.size()];
-//            Class[] arrClasses = new Class[params.size()];
-//            Object[] arrObjects = new Object[params.size()];
-//            
-//            int count = 0;
-//            for (String iter : params) {
-//                String tmpParam = ("p" + count);
-//                arrParams[count] = tmpParam;
-//                arrClasses[count] = String.class;
-//                
-//                String value = iter.trim();
-//                if (!isNumeric(value)) {
-//                    String strValue = "\"" + value + "\"";
-//                    strMap.put(value, strValue);
-//                }
-//                
-//                arrObjects[count] = value;
-//                count++;
-//            }
-//            
-////            System.out.println("[DataActionWorker].evaluateTrigger : tmpTrigger=" + tmpTrigger);
-////            System.out.println("[DataActionWorker].evaluateTrigger : strMap=" + strMap.toString());
-//            for (Entry<String, String> entry :strMap.entrySet()) {
-//                tmpTrigger = tmpTrigger.replace(entry.getKey(), entry.getValue());
-//            }
-//            
-//            //System.out.println("[DataActionWorker] checkTrigger : arrParams : ");
-//            //for (String iter : arrParams) System.out.println(iter);
-//            //System.out.println("[DataActionWorker] checkTrigger : arrObjects : ");
-//            //for (Object iter : arrObjects) System.out.println(iter.toString());
-//            
-//            // The expression will have two "int" parameters: "a" and "b".
-//            ee.setParameters(arrParams, arrClasses);
-//            
-//            // And the expression (i.e. "result") type is also "int".
-//            ee.setExpressionType(Boolean.class);
-//            
-//            // And now we "cook" (scan, parse, compile and load) the fabulous expression.
-//            //System.out.println("[DataActionWorker].evaluateTrigger :" + tmpTrigger);
-//            ee.cook(tmpTrigger);
-//            
-//            // Eventually we evaluate the expression - and that goes super-fast.
-//            result = (Boolean) ee.evaluate(arrObjects);
-//            
-////            System.out.println("[DataActionWorker].evaluateTrigger : trigger=" + trigger);
-////            System.out.println("[DataActionWorker].evaluateTrigger : tmpTrigger=" + tmpTrigger);
-////            System.out.println("[DataActionWorker].evaluateTrigger : result=" + result);
-//            
-//            return result;
-//        }
-//        catch (Exception e) {
-//            System.out.println("[DataActionWorker].evaluateTrigger : " + e.toString());
-//            return null;
-//        }
-//    }
-//    
-//    /**
-//     * Method Name : isNumeric
-//     * Method Desc : 臾몄옄�뿴 �닽�옄 �솗�씤
-//     * @param string
-//     * @return
-//     */
 
-//    
 //    /**
 //     * Method Name : getResult
 //     * Method Desc : result �젙蹂� 異붿텧
@@ -249,10 +209,7 @@ public class JsonRuleEngineImpl implements JsonRuleEngine {
 //        return ret;
 //    }
 	
-	private String replaceSingleQuotesToDoubleQuotes(String data) {
-		//
-		return data.replace("'","\"");
-	}
+	
 	
   
 }

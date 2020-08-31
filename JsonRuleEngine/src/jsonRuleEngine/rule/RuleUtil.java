@@ -10,4 +10,9 @@ public class RuleUtil {
 		
 		return string.matches("-?\\d+(\\.\\d+)?");
 	}
+	
+	public static String replaceSingleQuotesToDoubleQuotes(String data) {
+		//
+		return data.replace("'","\"");
+	}
 }
