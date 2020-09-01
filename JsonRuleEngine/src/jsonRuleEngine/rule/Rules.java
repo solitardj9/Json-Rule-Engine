@@ -13,7 +13,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
 
-import jsonRuleEngine.rule.Rules.RULE;
 import net.minidev.json.JSONArray;
 
 
@@ -55,19 +54,6 @@ public class Rules {
 					return ruleExpression;
 				}
 			}
-				
-		
-////
-////            @Override
-////            public Object doFunction(String function, String matchedFunction, String payload) {
-////                //
-////                String keyPath = getKeyPath(matchedFunction, function);
-////                if (keyPath != null) {
-////                    String key = payloadKey(payload, keyPath);
-////                    return key;
-////                }
-////                return null;
-////            }
 		},
 		FUNCTION_PAYLOAD_KEY_PATH("PAYLOAD_KEY_PATH", "PAYLOAD_KEY_PATH\\(([a-z-A-Z-\\s0-9.\\\"]*)\\)") {
 			//
@@ -96,16 +82,6 @@ public class Rules {
 					return ruleExpression;
 				}
             }
-//
-////            @Override
-////            public Object doFunction(String function, String matchedFunction, String payload) {
-////                //
-////                String keyPath = getKeyPath(matchedFunction, function);
-////                if (keyPath != null) {
-////                    return keyPath;
-////                }
-////                return null;
-////            }
         },
 		FUNCTION_PAYLOAD_VALUE("PAYLOAD_VALUE", "PAYLOAD_VALUE\\(([a-z-A-Z-\\s0-9.\\\"]*)\\)") {
         	//
@@ -131,6 +107,9 @@ public class Rules {
 								logger.info("[RULE.FUNCTION_PAYLOAD_VALUE].replaceRuleExpressionWithData : (a/f) ruleExpression = " + ruleExpression);
 							}
 						}
+						else {
+							return data;
+						}
 					}
 					
 					return ruleExpression;
@@ -139,20 +118,42 @@ public class Rules {
 					return ruleExpression;
 				}
 			}
-//
-//            @Override
-//            public Object doFunction(String function, String matchedFunction, String payload) {
-//                //
-//                String keyPath = getKeyPath(matchedFunction, function);
-//                if (keyPath != null) {
-//                    Object object = payloadValueAsString(payload, keyPath);
-//                    if (object != null) {
-//                        return object;
-//                    }
-//                    return null;
-//                }
-//                return payload;
-//            }
+		},
+		FUNCTION_PAYLOAD_VALUE_WITH("PAYLOAD_VALUE_WITH", "PAYLOAD_VALUE_WITH\\(([a-z-A-Z-\\s0-9.\\\\\"]*),(.*?)\\)") {
+        	//
+			@Override
+			public String replaceRuleExpressionWithData(String ruleExpression, String data) {
+				//
+				try {
+					Pattern p = Pattern.compile(this.getRegExp());
+					Matcher m = p.matcher(ruleExpression);
+					
+					while (m.find()) {
+						//
+						String matchedRule = m.group();
+						logger.info("[RULE.FUNCTION_PAYLOAD_VALUE_WITH].replaceRuleExpressionWithData : matchedRule = " + matchedRule);
+						
+						matchedRule = checkMatchedRuleExpression(matchedRule);
+						logger.info("[RULE.FUNCTION_PAYLOAD_VALUE_WITH].replaceRuleExpressionWithData : cheked matchedRule = " + matchedRule);
+						
+						KeyPathJson keyPathJson = getKeyPathWithInRuleExpression(matchedRule, this.getType(), data);
+						if (keyPathJson != null) {
+							//
+							String valueAsString = extractValueAsStringInDataByKeyPath(keyPathJson.getJsonString(), keyPathJson.getKeyPath());
+							if (valueAsString != null) {
+								logger.info("[RULE.FUNCTION_PAYLOAD_VALUE_WITH].replaceRuleExpressionWithData : (b/f) ruleExpression = " + ruleExpression);
+								ruleExpression = exchangeRuleExpression(ruleExpression, matchedRule, valueAsString);
+								logger.info("[RULE.FUNCTION_PAYLOAD_VALUE_WITH].replaceRuleExpressionWithData : (a/f) ruleExpression = " + ruleExpression);
+							}
+						}
+					}
+					
+					return ruleExpression;
+				} catch (Exception e) {
+					logger.info("[RULE.FUNCTION_PAYLOAD_VALUE].replaceRuleExpressionWithData : error = " + e.toString());
+					return ruleExpression;
+				}
+			}
 		},
 		FUNCTION_PAYLOAD_ARRAY("PAYLOAD_ARRAY", "PAYLOAD_ARRAY\\(([a-z-A-Z-\\s0-9.\\\"]*)\\,( [0-9]*)\\)") {
 			//
@@ -191,123 +192,34 @@ public class Rules {
 						
 				
 				
-////
-////            @Override
-////            public Object doFunction(String function, String matchedFunction, String payload) {
-////                //
-////                KeyPathIndex keyPathIndex = getKeyPathIndex(matchedFunction, function);
-////                
-////                if (keyPathIndex != null) {
-////                    //
-////                    if (keyPathIndex.getKeyPath() != null) {
-////                        //
-////                        Object object = payloadValueAsString(payload, keyPathIndex.getKeyPath());
-////                        if (object != null)
-////                            return object;
-////                        else
-////                            return payload;
-////                    }
-////                    else {
-////                        // payload ?��체�? json object�? ?��?�� json array?���? 봐야 ?��
-////                        Object object = payloadArrayValueAsString(payload, keyPathIndex.getIndex());
-////                        if (object != null)
-////                            return object;
-////                        else
-////                            return payload;
-////                    }
-////                }
-////                else {
-////                    return payload;
-////                }
-////            }
-		},
-		//\\,(.*)
-		FUNCTION_PAYLOAD_VALUE_WITH("PAYLOAD_VALUE_WITH", "PAYLOAD_VALUE_WITH\\(([a-z-A-Z-\\s0-9.\\\"]*),((.*?\\))\\)|(.*?\\})\\))") {
-		//FUNCTION_PAYLOAD_VALUE_WITH("PAYLOAD_VALUE_WITH", "PAYLOAD_VALUE_WITH\\(([a-z-A-Z-\\s0-9.\\\"]*),(.*?)\\)") {
-		//FUNCTION_PAYLOAD_VALUE_WITH("PAYLOAD_VALUE_WITH", "PAYLOAD_VALUE_WITH\\(([a-z-A-Z-\\s0-9.\\\"]*),(.*?\\))\\) | PAYLOAD_VALUE_WITH\\(([a-z-A-Z-\\s0-9.\\\"]*),(.*?)\\)") {
-		//FUNCTION_PAYLOAD_VALUE_WITH("PAYLOAD_VALUE_WITH", "PAYLOAD_VALUE_WITH\\(([a-z-A-Z-\\s0-9.\\\"]*),(.*?\\))|([a-z-A-Z-\\s0-9.\\\"]*),(.*?)\\)") {
-		//FUNCTION_PAYLOAD_VALUE_WITH("PAYLOAD_VALUE_WITH", "PAYLOAD_VALUE_WITH\\(([a-z-A-Z-\\s0-9.\\\"]*),(.*?\\))|(.*?)\\)") {
-		//FUNCTION_PAYLOAD_VALUE_WITH("PAYLOAD_VALUE_WITH", "PAYLOAD_VALUE_WITH\\(([a-z-A-Z-\\s0-9.\\\"]*),([a-zA-Z0-9.{,},(,),-,_])\\)") {
-		//FUNCTION_PAYLOAD_VALUE_WITH("PAYLOAD_VALUE_WITH", "PAYLOAD_VALUE_WITH\\(([a-z-A-Z-\\s0-9.\\\"]*),(.*?)\\)") {
-		//FUNCTION_PAYLOAD_VALUE_WITH("PAYLOAD_VALUE_WITH", "PAYLOAD_VALUE_WITH\\(([a-z-A-Z-\\s0-9.\\\"]*)\\,(.*)\\)") {
-		//FUNCTION_PAYLOAD_VALUE_WITH("PAYLOAD_VALUE_WITH", "PAYLOAD_VALUE_WITH\\(([a-z-A-Z-\\s0-9.\\\"]*)\\,( [a-z-A-Z-\\s0-9.,_\\-(){}\"]*)\\)") {
-        	//
-			@Override
-			public String replaceRuleExpressionWithData(String ruleExpression, String data) {
-				//
-//				String regExp1 = "PAYLOAD_VALUE_WITH\\(([a-z-A-Z-\\s0-9.\\\"]*),(.*?\\))\\)";
-//				String regExp2 = "PAYLOAD_VALUE_WITH\\(([a-z-A-Z-\\s0-9.\\\"]*),(.*?)\\)";
-//				
-//				try {
-//					Pattern p1 = Pattern.compile(regExp1);
-//					Matcher m1 = p1.matcher(ruleExpression);
-//					
-//					Pattern p2 = Pattern.compile(regExp2);
-//					Matcher m2 = p2.matcher(ruleExpression);
-//					
-//					String matchedRule1 = null;
-//					String matchedRule2 = null;
-//					
-//					while (m1.find()) {
-//						//
-//						matchedRule1 = m1.group();
-//					}
-//					
-//					while (m2.find()) {
-//						//
-//						matchedRule2 = m2.group();
-//					}
-//					
-//					System.out.println("matchedRule1 : " + matchedRule1);
-//					System.out.println("matchedRule2 : " + matchedRule2);
-//					
-//					return ruleExpression;
-//					
-//				} catch(Exception e) {
-//					logger.info("[RULE.FUNCTION_PAYLOAD_VALUE].replaceRuleExpressionWithData : error = " + e.toString());
-//					return ruleExpression;
-//				}
-				
-				try {
-					Pattern p = Pattern.compile(this.getRegExp());
-					Matcher m = p.matcher(ruleExpression);
-					
-					while (m.find()) {
-						//
-						String matchedRule = m.group();
-						logger.info("[RULE.FUNCTION_PAYLOAD_VALUE_WITH].replaceRuleExpressionWithData : matchedRule = " + matchedRule);
-						
-						KeyPathJson keyPathJson = getKeyPathWithInRuleExpression(matchedRule, this.getType(), data);
-						if (keyPathJson != null) {
-							//
-							String valueAsString = extractValueAsStringInDataByKeyPath(keyPathJson.getJsonString(), keyPathJson.getKeyPath());
-							if (valueAsString != null) {
-								logger.info("[RULE.FUNCTION_PAYLOAD_VALUE_WITH].replaceRuleExpressionWithData : (b/f) ruleExpression = " + ruleExpression);
-								ruleExpression = exchangeRuleExpression(ruleExpression, matchedRule, valueAsString);
-								logger.info("[RULE.FUNCTION_PAYLOAD_VALUE_WITH].replaceRuleExpressionWithData : (a/f) ruleExpression = " + ruleExpression);
-							}
-						}
-					}
-					
-					return ruleExpression;
-				} catch (Exception e) {
-					logger.info("[RULE.FUNCTION_PAYLOAD_VALUE].replaceRuleExpressionWithData : error = " + e.toString());
-					return ruleExpression;
-				}
-			}
 //
 //            @Override
 //            public Object doFunction(String function, String matchedFunction, String payload) {
 //                //
-//                String keyPath = getKeyPath(matchedFunction, function);
-//                if (keyPath != null) {
-//                    Object object = payloadValueAsString(payload, keyPath);
-//                    if (object != null) {
-//                        return object;
+//                KeyPathIndex keyPathIndex = getKeyPathIndex(matchedFunction, function);
+//                
+//                if (keyPathIndex != null) {
+//                    //
+//                    if (keyPathIndex.getKeyPath() != null) {
+//                        //
+//                        Object object = payloadValueAsString(payload, keyPathIndex.getKeyPath());
+//                        if (object != null)
+//                            return object;
+//                        else
+//                            return payload;
 //                    }
-//                    return null;
+//                    else {
+//                        // payload ?��체�? json object�? ?��?�� json array?���? 봐야 ?��
+//                        Object object = payloadArrayValueAsString(payload, keyPathIndex.getIndex());
+//                        if (object != null)
+//                            return object;
+//                        else
+//                            return payload;
+//                    }
 //                }
-//                return payload;
+//                else {
+//                    return payload;
+//                }
 //            }
 		},
 		
@@ -336,21 +248,8 @@ public class Rules {
 
 		public abstract String replaceRuleExpressionWithData(String ruleExpression, String data);
 		
-//		public abstract Object doFunction(String function, String matchedFunction, String payload);
+//		public abstract String executeRuleExpressionWithData(String ruleExpression, String data);
 	}
-	
-	
-//	public static String getFunction(String function) {
-//		//
-//		for (RULE iter : RULE.values()) {
-//			if (iter.toString().equals(function)) {
-//				return iter.getValue();
-//			}
-//		}
-//		return null;
-//	}
-	
-	
 	
 	public static List<String> getRuleTypes() {
 		//
@@ -548,7 +447,6 @@ public class Rules {
 	
 	private static KeyPathJson getKeyPathWithInRuleExpression(String ruleExpression, String ruleType, String data) {
 		//
-		//String keyPathAndJsonString = ruleExpression.replace(ruleType, "").replace("(", "").replace(")", "");
 		String keyPathAndJsonString = ruleExpression.replaceFirst(ruleType, "");
 		keyPathAndJsonString = keyPathAndJsonString.replaceFirst("\\(", "");
 		
@@ -659,44 +557,40 @@ public class Rules {
 		}
 	}
 	
-	
-	
-	
-	
-//	/**
-//	 * Method Name : replaceFunction
-//	 * Method Desc : Function 문자?��?�� ?��?��?��?�� ?��?��값을 ?��?��?�� 문자?���? �??��
-//	 * @param function
-//	 * @param string
-//	 * @param matchedFunction
-//	 * @param payload
-//	 * @return
-//	 */
-//	public static String replaceFunction(String function, String string, String matchedFunction, String payload) {
-//		//
-//		for (FUNCTION iter : FUNCTION.values()) {
-//			if (iter.toString().equals(function)) {
-//				return iter.replaceFunction(function, string, matchedFunction, payload);
-//			}
-//		}
-//		return null;
-//	}
-//	
-
-
-
-//	
-
-//
-//    public static Object doFunction(String function, String matchedFunction, String payload) {
-//        //
-//        for (FUNCTION iter : FUNCTION.values()) {
-//            if (iter.toString().equals(function)) {
-//                return iter.doFunction(function, matchedFunction, payload);
-//            }
-//        }
-//        return null;
-//    }
+	private static String checkMatchedRuleExpression(String mactchedExpression) {
+		//
+		Integer countOfOpen = 0;
+		Integer countOfclose = 0;
+		Integer fromIndex = 0;
+		
+		while (true) {
+			Integer tmpIndex = mactchedExpression.indexOf("(", fromIndex);
+			if (tmpIndex < 0) {
+				break;
+			}
+			fromIndex = tmpIndex + 1;
+			countOfOpen++;
+		}
+		
+		fromIndex = 0;
+		while (true) {
+			Integer tmpIndex = mactchedExpression.indexOf(")", fromIndex);
+			if (tmpIndex < 0) {
+				break;
+			}
+			fromIndex = tmpIndex + 1;
+			countOfclose++;
+		}
+		
+		Integer diff = countOfOpen - countOfclose;
+		if (diff > 0) {
+			for (int i = 0 ; i < diff ; i++) {
+				mactchedExpression += ")";
+			}
+		}
+		
+		return mactchedExpression;
+	}
 }
 
 class KeyPathIndex {

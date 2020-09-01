@@ -172,44 +172,22 @@ public class JsonRuleEngineImpl implements JsonRuleEngine {
 	
 	private String makeResult(String result, String data) {
 		//
-		// TODO
+		String tmpResult = RuleUtil.replaceSingleQuotesToDoubleQuotes(new String(result));
 		
-		return null;
+		logger.info("[JsonRuleEngine].makeResult : tmpResult = " + tmpResult);
+		
+		// 2) get Rules
+		List<String> ruleTypes = Rules.getRuleTypes();
+		
+		logger.info("[JsonRuleEngine].makeResult : ruleTypes = " + ruleTypes.toString());
+		
+		for (String ruleType : ruleTypes) {
+			//
+			RULE rule = Rules.getRuleByType(ruleType);
+			
+			tmpResult = rule.replaceRuleExpressionWithData(tmpResult, data);
+		}
+		
+		return tmpResult;
 	}
-	
-	
-	
-	
-	
-	
-
-//    /**
-//     * Method Name : getResult
-//     * Method Desc : result �젙蹂� 異붿텧
-//     * @param function
-//     * @param data
-//     * @return
-//     */
-//    private Object getResult(String function, String data) {
-//        //
-//        Object ret = null;
-//        List<String> functions = Functions.getFunctions();
-//        
-//        for (String iter : functions) {
-//            //
-//            Pattern p = Pattern.compile(Functions.getFunctionRegExp(iter));
-//            Matcher m = p.matcher(function);
-//            
-//            while(m.find()) {
-//                String matchedFunction = m.group();
-//                ret = Functions.doFunction(iter, matchedFunction, data);
-//            }
-//        }
-//        
-//        return ret;
-//    }
-	
-	
-	
-  
 }
