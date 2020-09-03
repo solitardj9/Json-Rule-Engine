@@ -24,19 +24,19 @@
 // result is json object.
 // event is simple string.
 {
-  "configs" : 
-    {
-      "trigger" : "((read($.eqpType) == 'ESS') && (read($.data.errorCode) != 0) && (read($.data.values[0]) == 1))",
+	"configs" : [
+		{
+			"trigger" : "((read($.eqpType) == 'ESS') && (read($.data.errorCode) != 0) && (read($.data.values[0]) == 1))",
 			"result" : {
-        "siteId" : "read($.siteId)", 
-        "eqpId" : "read($.eqpId)", 
-        "errorCode" : "read($.data.errorCode)"
-      },
-      "event" : {
-        "eventType" : "alarm"
-      }
-    }
-  ]
+				"siteId" : "read($.siteId)", 
+				"eqpId" : "read($.eqpId)", 
+				"errorCode" : "read($.data.errorCode)"
+			},
+			"event" : {
+				"eventType" : "alarm"
+			}
+		}
+	]
 }
 </code>
 </pre>
