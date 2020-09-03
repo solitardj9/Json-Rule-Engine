@@ -26,9 +26,8 @@
 {
 	"configs" : [
 		{
-			"trigger" : "((read($.eqpType) == 'ESS') && (read($.data.errorCode) != 0) && (read($.data.values[0]) == 1))",
+			"trigger" : "((read($.eqpType) == 'AC') && (read($.data.errorCode) != 0) && (read($.data.values[0]) == 1))",
 			"result" : {
-				"siteId" : "read($.siteId)", 
 				"eqpId" : "read($.eqpId)", 
 				"errorCode" : "read($.data.errorCode)"
 			},
@@ -60,7 +59,8 @@ jsonRuleEngine.insertConfigs(configs);
 		"onoff" : "on",
 		"setTemp" : 30,
 		"roomTemp" : 24,
-		"errorCode" : 10
+		"errorCode" : 10,
+		"values": [1,2,3,4]
 	},
 	"eqpId":"{eqpId}",
 	"eqpType":"AC"
@@ -97,7 +97,7 @@ for (JsonRuleEngineResultSet iter : results) {
 }
 
 // print output
-JsonRuleEngineResultSet [result={"errorCode":10,"eqpId":"{eqpId}","eqpType":"AC"}, event=error]
+[JsonRuleEngineResultSet [result={"errorCode":10,"eqpId":"{eqpId}"}, event={eventType=alarm}]]
 </code>
 </pre>
 
