@@ -1,8 +1,8 @@
-package jsonRuleEngine;
+package jsonRuleEngine_v1_0;
 
 import java.util.List;
 
-import jsonRuleEngine.data.JsonRuleEngineConfigs;
+import jsonRuleEngine_v1_0.data.JsonRuleEngineConfigs;
 
 public interface JsonRuleEngine {
 	

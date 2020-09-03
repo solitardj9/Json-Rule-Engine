@@ -1,6 +1,9 @@
-package jsonRuleEngine;
+package jsonRuleEngine_v1_0;
 
 import java.util.List;
+
+import jsonRuleEngine_v1_0.JsonRuleEngine;
+import jsonRuleEngine_v1_0.JsonRuleEngineImpl;
 
 public class Test {
 	

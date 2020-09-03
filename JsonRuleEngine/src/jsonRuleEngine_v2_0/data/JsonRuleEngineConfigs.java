@@ -1,4 +1,4 @@
-package jsonRuleEngine.data;
+package jsonRuleEngine_v2_0.data;
 
 import java.util.ArrayList;
 import java.util.List;

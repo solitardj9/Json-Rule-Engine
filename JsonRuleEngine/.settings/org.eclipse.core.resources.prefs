@@ -1,2 +1,4 @@
 eclipse.preferences.version=1
-encoding//src/jsonRuleEngine/JsonRuleEngineImpl.java=UTF-8
+encoding//src/jsonRuleEngine_v1_0/JsonRuleEngineImpl.java=UTF-8
+encoding//src/jsonRuleEngine_v1_0/rule/Rules.java=UTF-8
+encoding//src/jsonRuleEngine_v2_0/JsonRuleEngineImpl.java=UTF-8

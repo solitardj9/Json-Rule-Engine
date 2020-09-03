@@ -1,4 +1,4 @@
-package jsonRuleEngine.data;
+package jsonRuleEngine_v1_0.data;
 
 public class JsonRuleEngineConfig {
 	//

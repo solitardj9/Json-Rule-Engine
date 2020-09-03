@@ -1,4 +1,4 @@
-package jsonRuleEngine.rule;
+package jsonRuleEngine_v1_0.rule;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,7 +13,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
 
-import jsonRuleEngine.rule.Rules.RULE;
+import jsonRuleEngine_v1_0.rule.Rules.RULE;
 import net.minidev.json.JSONArray;
 
 
@@ -186,43 +186,10 @@ public class Rules {
 					return ruleExpression;
 				}
 			}
-						
-						
-						
-				
-				
-////
-////            @Override
-////            public Object doFunction(String function, String matchedFunction, String payload) {
-////                //
-////                KeyPathIndex keyPathIndex = getKeyPathIndex(matchedFunction, function);
-////                
-////                if (keyPathIndex != null) {
-////                    //
-////                    if (keyPathIndex.getKeyPath() != null) {
-////                        //
-////                        Object object = payloadValueAsString(payload, keyPathIndex.getKeyPath());
-////                        if (object != null)
-////                            return object;
-////                        else
-////                            return payload;
-////                    }
-////                    else {
-////                        // payload ?ÔøΩÔøΩÏ≤¥ÔøΩ? json objectÔøΩ? ?ÔøΩÔøΩ?ÔøΩÔøΩ json array?ÔøΩÔøΩÔøΩ? Î¥êÏïº ?ÔøΩÔøΩ
-////                        Object object = payloadArrayValueAsString(payload, keyPathIndex.getIndex());
-////                        if (object != null)
-////                            return object;
-////                        else
-////                            return payload;
-////                    }
-////                }
-////                else {
-////                    return payload;
-////                }
-////            }
 		},
 		//\\,(.*)
 		FUNCTION_PAYLOAD_VALUE_WITH("PAYLOAD_VALUE_WITH", "PAYLOAD_VALUE_WITH\\(([a-z-A-Z-\\s0-9.\\\"]*),((.*?\\))\\)|(.*?\\})\\))") {
+		//FUNCTION_PAYLOAD_VALUE_WITH("PAYLOAD_VALUE_WITH", "PAYLOAD_VALUE_WITH\\(([a-z-A-Z-\\s0-9.\\\"]*),((.*?\\))\\)|(.*?\\})\\))") {
 		//FUNCTION_PAYLOAD_VALUE_WITH("PAYLOAD_VALUE_WITH", "PAYLOAD_VALUE_WITH\\(([a-z-A-Z-\\s0-9.\\\"]*),(.*?)\\)") {
 		//FUNCTION_PAYLOAD_VALUE_WITH("PAYLOAD_VALUE_WITH", "PAYLOAD_VALUE_WITH\\(([a-z-A-Z-\\s0-9.\\\"]*),(.*?\\))\\) | PAYLOAD_VALUE_WITH\\(([a-z-A-Z-\\s0-9.\\\"]*),(.*?)\\)") {
 		//FUNCTION_PAYLOAD_VALUE_WITH("PAYLOAD_VALUE_WITH", "PAYLOAD_VALUE_WITH\\(([a-z-A-Z-\\s0-9.\\\"]*),(.*?\\))|([a-z-A-Z-\\s0-9.\\\"]*),(.*?)\\)") {
@@ -310,7 +277,73 @@ public class Rules {
 //                return payload;
 //            }
 		},
-		
+//		FUNCTION_PAYLOAD_ARRAY("PAYLOAD_ARRAY", "PAYLOAD_ARRAY\\(([a-z-A-Z-\\s0-9.\\\"]*)\\,( [0-9]*)\\)") {
+//			//
+//			@Override
+//			public String replaceRuleExpressionWithData(String ruleExpression, String data) {
+//				//
+//				try {
+//					Pattern p = Pattern.compile(this.getRegExp());
+//					Matcher m = p.matcher(ruleExpression);
+//					
+//					while (m.find()) {
+//						//
+//						String matchedRule = m.group();
+//						logger.info("[RULE.FUNCTION_PAYLOAD_ARRAY].replaceRuleExpressionWithData : matchedRule = " + matchedRule);
+//						
+//						KeyPathIndex keyPathIndex = getKeyPathAndArrayIndexInRuleExpression(matchedRule, this.getType());
+//						if (keyPathIndex != null) {
+//							//
+//							String valueAsString = extractValueAsStringInArrayDataByKeyPath(data, keyPathIndex);
+//							if (valueAsString != null) {
+//								logger.info("[RULE.FUNCTION_PAYLOAD_ARRAY].replaceRuleExpressionWithData : (b/f) ruleExpression = " + ruleExpression);
+//								ruleExpression = exchangeRuleExpression(ruleExpression, matchedRule, valueAsString);
+//								logger.info("[RULE.FUNCTION_PAYLOAD_ARRAY].replaceRuleExpressionWithData : (a/f) ruleExpression = " + ruleExpression);
+//							}
+//						}
+//					}
+//					
+//					return ruleExpression;
+//				} catch (Exception e) {
+//					logger.info("[RULE.FUNCTION_PAYLOAD_ARRAY].replaceRuleExpressionWithData : error = " + e.toString());
+//					return ruleExpression;
+//				}
+//			}
+//						
+//						
+//						
+//				
+//				
+////
+////            @Override
+////            public Object doFunction(String function, String matchedFunction, String payload) {
+////                //
+////                KeyPathIndex keyPathIndex = getKeyPathIndex(matchedFunction, function);
+////                
+////                if (keyPathIndex != null) {
+////                    //
+////                    if (keyPathIndex.getKeyPath() != null) {
+////                        //
+////                        Object object = payloadValueAsString(payload, keyPathIndex.getKeyPath());
+////                        if (object != null)
+////                            return object;
+////                        else
+////                            return payload;
+////                    }
+////                    else {
+////                        // payload ??ç†?èô?òôÔß£Îåê?òô? json object?ç†Ôø?? ??ç†?èô?òô??ç†?èô?òô json array??ç†?èô?òô?ç†Ôø?? ?ÅäÎ®?Îπ? ??ç†?èô?òô
+////                        Object object = payloadArrayValueAsString(payload, keyPathIndex.getIndex());
+////                        if (object != null)
+////                            return object;
+////                        else
+////                            return payload;
+////                    }
+////                }
+////                else {
+////                    return payload;
+////                }
+////            }
+//		},
 		;
 		
 		private String type;
@@ -665,7 +698,7 @@ public class Rules {
 	
 //	/**
 //	 * Method Name : replaceFunction
-//	 * Method Desc : Function Î¨∏Ïûê?ÔøΩÔøΩ?ÔøΩÔøΩ ?ÔøΩÔøΩ?ÔøΩÔøΩ?ÔøΩÔøΩ?ÔøΩÔøΩ ?ÔøΩÔøΩ?ÔøΩÔøΩÍ∞íÏùÑ ?ÔøΩÔøΩ?ÔøΩÔøΩ?ÔøΩÔøΩ Î¨∏Ïûê?ÔøΩÔøΩÔøΩ? ÔøΩ??ÔøΩÔøΩ
+//	 * Method Desc : Function ?áæÎ™ÑÏòÑ??ç†?èô?òô??ç†?èô?òô ??ç†?èô?òô??ç†?èô?òô??ç†?èô?òô??ç†?èô?òô ??ç†?èô?òô??ç†?èô?òôÂ™õÎ?™Ïì£ ??ç†?èô?òô??ç†?èô?òô??ç†?èô?òô ?áæÎ™ÑÏòÑ??ç†?èô?òô?ç†Ôø?? ?ç†Ôø????ç†?èô?òô
 //	 * @param function
 //	 * @param string
 //	 * @param matchedFunction
