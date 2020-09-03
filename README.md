@@ -37,6 +37,10 @@
 		}
 	]
 }
+
+// Both available
+// (read($.eqpType) == 'AC'
+// (read($.eqpType) == \"AC\"
 </code>
 </pre>
 
