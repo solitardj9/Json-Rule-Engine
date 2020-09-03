@@ -1,0 +1,11 @@
+dataActionMngt:
+  configs: '{"configs" : [{"trigger" : "((read($.eqpType) == \"AC\") && (read($.data.errorCode) != 0) && (read($.data.values[0]) == 1))", "result" : {"eqpId" : "read($.eqpId)", "errorCode" : "read($.data.errorCode)"}, "event" : "error"}]}'
+dataActionPluginMngt:
+  errorActionPlugin:
+    httpClient:
+      scheme: http
+      url: 127.0.0.1:18087
+      path: vppService/error
+      httpMethodType: put
+      queryParamConfigs: '{}'
+      headerParamConfigs: '{"Content-Type":"application/json"}'
